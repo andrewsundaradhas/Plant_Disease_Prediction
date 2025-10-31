@@ -1,111 +1,262 @@
-import React from 'react';
-import { FiActivity, FiBarChart2, FiClock, FiFilter, FiSearch, FiUpload } from 'react-icons/fi';
+import React, { useState, useRef, useEffect } from 'react';
+import { FiActivity, FiBarChart2, FiClock, FiUpload, FiAlertCircle, FiInfo, FiCheckCircle } from 'react-icons/fi';
+import { predictImage } from '../api/cropHealthApi';
+import PredictionResult from '../components/Prediction/PredictionResult';
 
-// Mock data - in a real app, this would come from an API
-const mockPredictions = [
-  {
-    id: 1,
-    image: '/placeholder-leaf.jpg',
-    prediction: 'Apple___Apple_scab',
-    confidence: 0.95,
-    timestamp: '2023-06-15T10:30:00Z',
-    status: 'completed',
+// Disease information with solutions
+const DISEASE_INFO = {
+  'Apple___Apple_scab': {
+    description: 'A fungal disease that affects apple trees, causing dark, scaly lesions on leaves and fruit.',
+    solution: [
+      'Apply fungicides during early spring when leaves are first unfolding',
+      'Remove and destroy fallen leaves and fruit to reduce spore spread',
+      'Prune trees to improve air circulation',
+      'Plant resistant varieties when possible'
+    ]
   },
-  {
-    id: 2,
-    image: '/placeholder-leaf-2.jpg',
-    prediction: 'Tomato___Bacterial_spot',
-    confidence: 0.87,
-    timestamp: '2023-06-14T15:45:00Z',
-    status: 'completed',
+  'Tomato___Bacterial_spot': {
+    description: 'A bacterial disease causing small, dark, scabby spots on tomato leaves, stems, and fruit.',
+    solution: [
+      'Use disease-free seeds and transplants',
+      'Apply copper-based bactericides',
+      'Avoid overhead watering',
+      'Rotate crops and remove plant debris'
+    ]
   },
-  {
-    id: 3,
-    image: '/placeholder-leaf-3.jpg',
-    prediction: 'Corn___Common_rust',
-    confidence: 0.92,
-    timestamp: '2023-06-13T09:15:00Z',
-    status: 'completed',
+  'Corn___Common_rust': {
+    description: 'A fungal disease causing rust-colored pustules on corn leaves, reducing photosynthesis.',
+    solution: [
+      'Plant resistant hybrid varieties',
+      'Apply fungicides when necessary',
+      'Ensure proper plant spacing for air circulation',
+      'Rotate crops with non-host plants'
+    ]
   },
-];
-
-const stats = [
-  { name: 'Total Predictions', value: '128', icon: FiActivity, change: '+12%', changeType: 'increase' },
-  { name: 'Accuracy', value: '94%', icon: FiBarChart2, change: '+2%', changeType: 'increase' },
-  { name: 'Avg. Response Time', value: '1.2s', icon: FiClock, change: '-0.3s', changeType: 'decrease' },
-];
+  // Add more diseases as needed
+};
 
 const DashboardPage: React.FC = () => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<any>(null);
+  const [topPredictions, setTopPredictions] = useState<Array<{ className: string; probability: number }>>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setError('File size should be less than 5MB');
+        return;
+      }
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setError(null);
+    }
   };
 
-  const formatConfidence = (confidence: number) => {
-    return (confidence * 100).toFixed(0) + '%';
+  const handlePredict = async () => {
+    if (!selectedFile) {
+      setError('Please select an image first');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await predictImage(selectedFile);
+      setPrediction(result);
+      
+      // Sort predictions by confidence and take top 3
+      const sortedPredictions = Object.entries(result.confidences || {})
+        .map(([className, probability]) => ({
+          className,
+          probability: probability as number
+        }))
+        .sort((a, b) => b.probability - a.probability)
+        .slice(0, 3);
+      
+      setTopPredictions(sortedPredictions);
+    } catch (err) {
+      console.error('Prediction error:', err);
+      setError('Failed to process the image. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const formatPredictionName = (name: string) => {
+  const resetPrediction = () => {
+    setSelectedFile(null);
+    setPreviewUrl('');
+    setPrediction(null);
+    setTopPredictions([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Format prediction class name for display
+  const formatClassName = (name: string) => {
     return name
       .split('___')
-      .map(part => part.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' '))
+      .map(part => part.split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' '))
       .join(' - ');
   };
 
+  // Clean up object URLs to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-500">Overview of your crop health predictions and statistics</p>
+        <h1 className="text-3xl font-bold text-gray-900">Plant Disease Detection</h1>
+        <p className="mt-2 text-lg text-gray-600">Upload an image of a plant leaf to detect potential diseases and get treatment recommendations</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-        {stats.map((stat) => (
-          <div key={stat.name} className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 bg-primary-100 p-3 rounded-md">
-                  <stat.icon className="h-6 w-6 text-primary-600" aria-hidden="true" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Upload Section */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white shadow rounded-lg p-6">
+            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              {!previewUrl ? (
+                <div className="space-y-4">
+                  <FiUpload className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="text-sm text-gray-600">
+                    <label
+                      htmlFor="file-upload"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none"
+                    >
+                      <span>Upload an image</span>
+                      <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        ref={fileInputRef}
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">PNG, JPG, JPEG up to 5MB</p>
                 </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">{stat.name}</dt>
-                    <dd>
-                      <div className="text-lg font-medium text-gray-900">{stat.value}</div>
-                    </dd>
-                  </dl>
+              ) : (
+                <div className="relative w-full">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="max-h-96 mx-auto rounded-lg"
+                    onLoad={() => URL.revokeObjectURL(previewUrl)}
+                  />
+                  <button
+                    onClick={resetPrediction}
+                    className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md text-gray-600 hover:text-gray-800"
+                    title="Remove image"
+                  >
+                    ×
+                  </button>
                 </div>
-              </div>
+              )}
             </div>
-            <div className="bg-gray-50 px-5 py-3">
-              <div className="text-sm">
-                <span className={`font-medium ${
-                  stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {stat.change}
-                </span>{' '}
-                <span className="text-gray-500">from last month</span>
+
+            {error && (
+              <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md flex items-start">
+                <FiAlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                <span>{error}</span>
               </div>
+            )}
+
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={handlePredict}
+                disabled={!selectedFile || isLoading}
+                className={`px-6 py-3 rounded-md text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 ${
+                  !selectedFile || isLoading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-primary-600 hover:bg-primary-700'
+                }`}
+              >
+                {isLoading ? 'Analyzing...' : 'Analyze Image'}
+              </button>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Recent Predictions */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Recent Predictions</h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">Your most recent crop health analyses</p>
+          {/* Prediction Results */}
+          {prediction && (
+            <div className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="px-6 py-5 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">Analysis Results</h3>
+              </div>
+              <div className="p-6">
+                <PredictionResult prediction={prediction} topPredictions={topPredictions} />
+              </div>
             </div>
-            <div className="flex space-x-3">
+          )}
+        </div>
+
+        {/* Information Panel */}
+        <div className="space-y-6">
+          <div className="bg-white shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">How it works</h3>
+            <ol className="space-y-4">
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">1</div>
+                <p className="ml-3 text-gray-600">Take a clear photo of the affected plant leaf</p>
+              </li>
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">2</div>
+                <p className="ml-3 text-gray-600">Upload the image using the panel on the left</p>
+              </li>
+              <li className="flex items-start">
+                <div className="flex-shrink-0 h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-medium">3</div>
+                <p className="ml-3 text-gray-600">Get instant analysis and treatment recommendations</p>
+              </li>
+            </ol>
+          </div>
+
+          {prediction && prediction.predicted_class in DISEASE_INFO && (
+            <div className="bg-white shadow rounded-lg overflow-hidden">
+              <div className="px-6 py-5 bg-gray-50 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-900">About {formatClassName(prediction.predicted_class)}</h3>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex items-start">
+                  <FiInfo className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                  <p className="text-gray-700">{DISEASE_INFO[prediction.predicted_class as keyof typeof DISEASE_INFO].description}</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Recommended Solutions:</h4>
+                  <ul className="space-y-2">
+                    {DISEASE_INFO[prediction.predicted_class as keyof typeof DISEASE_INFO].solution.map((step, index) => (
+                      <li key={index} className="flex items-start">
+                        <FiCheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700">{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DashboardPage;
               <div className="relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FiSearch className="h-4 w-4 text-gray-400" />
