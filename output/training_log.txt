@@ -1,0 +1,119 @@
+2025-10-24 01:34:20,751 - INFO - Creating data generators...
+2025-10-24 01:34:21,866 - INFO - Creating model with 15 classes...
+2025-10-24 01:34:23,288 - INFO - Compiling model...
+2025-10-24 01:34:23,744 - INFO - Starting training...
+2025-10-24 01:52:05,666 - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-10-24 01:52:20,479 - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-10-24 01:52:22,745 - INFO - Model saved to output\final_model.h5
+2025-10-24 01:56:23,601 - INFO - Creating data generators...
+2025-10-24 01:56:25,580 - INFO - Creating model with 15 classes...
+2025-10-24 01:56:28,151 - INFO - Compiling model...
+2025-10-24 01:56:28,785 - INFO - Starting training...
+2025-10-24 02:12:48,851 - INFO - Creating data generators...
+2025-10-24 02:12:54,784 - INFO - Creating model with 15 classes...
+2025-10-24 02:12:59,958 - INFO - Compiling model...
+2025-10-24 02:13:01,038 - INFO - Starting training...
+2025-10-24 02:17:35,566 - ERROR - Error during training: Graph execution error:
+
+Detected at node PyFunc defined at (most recent call last):
+<stack traces unavailable>
+MemoryError: Unable to allocate 18.4 MiB for an array with shape (32, 224, 224, 3) and data type float32
+Traceback (most recent call last):
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\python\ops\script_ops.py", line 269, in __call__
+    ret = func(*args)
+          ^^^^^^^^^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\python\autograph\impl\api.py", line 643, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\python\data\ops\from_generator_op.py", line 198, in generator_py_func
+    values = next(generator_state.get_iterator(iterator_id))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\keras\src\trainers\data_adapters\py_dataset_adapter.py", line 264, in _finite_generator
+    yield self._standardize_batch(self.py_dataset[i])
+                                  ~~~~~~~~~~~~~~~^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\keras\src\legacy\preprocessing\image.py", line 68, in __getitem__
+    return self._get_batches_of_transformed_samples(index_array)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\keras\src\legacy\preprocessing\image.py", line 306, in _get_batches_of_transformed_samples
+    batch_x = np.zeros(
+              ^^^^^^^^^
+
+numpy._core._exceptions._ArrayMemoryError: Unable to allocate 18.4 MiB for an array with shape (32, 224, 224, 3) and data type float32
+
+
+	 [[{{node PyFunc}}]]
+	 [[IteratorGetNext]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+ [Op:__inference_multi_step_on_iterator_18511]
+Traceback (most recent call last):
+  File "C:\Users\Admin\Downloads\aws crop\ml\train_plantvillage.py", line 292, in train_model
+    history = model.fit(
+              ^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\python\eager\execute.py", line 59, in quick_execute
+    except TypeError as e:
+tensorflow.python.framework.errors_impl.ResourceExhaustedError: Graph execution error:
+
+Detected at node PyFunc defined at (most recent call last):
+<stack traces unavailable>
+MemoryError: Unable to allocate 18.4 MiB for an array with shape (32, 224, 224, 3) and data type float32
+Traceback (most recent call last):
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\python\ops\script_ops.py", line 269, in __call__
+    ret = func(*args)
+          ^^^^^^^^^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\python\autograph\impl\api.py", line 643, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\python\data\ops\from_generator_op.py", line 198, in generator_py_func
+    values = next(generator_state.get_iterator(iterator_id))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\keras\src\trainers\data_adapters\py_dataset_adapter.py", line 264, in _finite_generator
+    yield self._standardize_batch(self.py_dataset[i])
+                                  ~~~~~~~~~~~~~~~^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\keras\src\legacy\preprocessing\image.py", line 68, in __getitem__
+    return self._get_batches_of_transformed_samples(index_array)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\keras\src\legacy\preprocessing\image.py", line 306, in _get_batches_of_transformed_samples
+    batch_x = np.zeros(
+              ^^^^^^^^^
+
+numpy._core._exceptions._ArrayMemoryError: Unable to allocate 18.4 MiB for an array with shape (32, 224, 224, 3) and data type float32
+
+
+	 [[{{node PyFunc}}]]
+	 [[IteratorGetNext]]
+Hint: If you want to see a list of allocated tensors when OOM happens, add report_tensor_allocations_upon_oom to RunOptions for current allocation info. This isn't available when running in Eager mode.
+ [Op:__inference_multi_step_on_iterator_18511]
+2025-10-24 02:17:35,421 - ERROR - Error during training: Graph execution error:
+
+Detected at node StatefulPartitionedCall/functional_1/block7a_project_conv_1/convolution defined at (most recent call last):
+<stack traces unavailable>
+Operation received an exception:Status: 1, message: could not create a memory object, in file tensorflow/core/kernels/mkl/mkl_conv_ops.cc:1112
+	 [[{{node StatefulPartitionedCall/functional_1/block7a_project_conv_1/convolution}}]] [Op:__inference_multi_step_on_iterator_41024]
+Traceback (most recent call last):
+  File "C:\Users\Admin\Downloads\aws crop\ml\train_plantvillage.py", line 292, in train_model
+    history = model.fit(
+              ^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\python\eager\execute.py", line 59, in quick_execute
+    except TypeError as e:
+tensorflow.python.framework.errors_impl.AbortedError: Graph execution error:
+
+Detected at node StatefulPartitionedCall/functional_1/block7a_project_conv_1/convolution defined at (most recent call last):
+<stack traces unavailable>
+Operation received an exception:Status: 1, message: could not create a memory object, in file tensorflow/core/kernels/mkl/mkl_conv_ops.cc:1112
+	 [[{{node StatefulPartitionedCall/functional_1/block7a_project_conv_1/convolution}}]] [Op:__inference_multi_step_on_iterator_41024]

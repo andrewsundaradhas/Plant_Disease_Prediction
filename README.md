@@ -1,58 +1,150 @@
+# Crop Health Prediction System
 
-# Welcome to your CDK Python project!
+A comprehensive system for predicting crop health using machine learning and deep learning techniques.
 
-This is a blank project for CDK development with Python.
+## 🚀 Features
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+- **Machine Learning Model**: Trained on plant disease datasets for accurate predictions
+- **RESTful API**: FastAPI backend with comprehensive documentation
+- **Modern Frontend**: React-based user interface with responsive design
+- **Database**: MongoDB for data persistence
+- **Scalable**: Designed to handle multiple concurrent requests
+- **Easy Setup**: One-command setup and deployment
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+## 🛠️ Prerequisites
 
-To manually create a virtualenv on MacOS and Linux:
+- Python 3.8+
+- Node.js 16+
+- npm 8+
+- MongoDB 5.0+
+- Git
 
-```
-$ python -m venv .venv
-```
+## 🚀 Quick Start
 
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
+### 1. Clone the Repository
 
-```
-$ source .venv/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .venv\Scripts\activate.bat
+```bash
+git clone https://github.com/yourusername/crop-health-prediction.git
+cd crop-health-prediction
 ```
 
-Once the virtualenv is activated, you can install the required dependencies.
+### 2. Run Setup Script
 
-```
-$ pip install -r requirements.txt
-```
-
-At this point you can now synthesize the CloudFormation template for this code.
-
-```
-$ cdk synth
+```bash
+python setup.py
 ```
 
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
+This will:
+- Create a Python virtual environment
+- Install all required dependencies
+- Set up the database
+- Configure environment variables
 
-## Useful commands
+### 3. Configure Environment Variables
 
- * `cdk ls`          list all stacks in the app
- * `cdk synth`       emits the synthesized CloudFormation template
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk docs`        open CDK documentation
+Edit the `.env` file in the project root with your configuration:
 
-Enjoy!
+```env
+DEBUG=True
+MONGODB_URI=mongodb://localhost:27017/crop_health
+SECRET_KEY=your-secret-key
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=your-bucket-name
+```
+
+### 4. Start the Backend Server
+
+```bash
+cd backend
+uvicorn app.main:app --reload
+```
+
+The API will be available at `http://localhost:8000`
+
+### 5. Start the Frontend Development Server
+
+```bash
+cd frontend
+npm start
+```
+
+The application will open in your default browser at `http://localhost:3000`
+
+## 🧠 Machine Learning Model
+
+The machine learning model is located in the `ml/` directory. To train a new model:
+
+```bash
+cd ml
+python train.py
+```
+
+### Model Architecture
+
+- **Base Model**: EfficientNetB0 (pre-trained on ImageNet)
+- **Input Size**: 224x224 pixels
+- **Output**: Probability distribution over disease classes
+- **Training**: Transfer learning with fine-tuning
+
+## 📚 API Documentation
+
+Once the backend server is running, access the interactive API documentation at:
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+## 📦 Deployment
+
+### Backend (Production)
+
+```bash
+# Install production dependencies
+pip install gunicorn
+
+# Run with Gunicorn
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app
+```
+
+### Frontend (Production Build)
+
+```bash
+cd frontend
+npm run build
+```
+
+## 🧪 Testing
+
+### Backend Tests
+
+```bash
+cd backend
+pytest
+```
+
+### Frontend Tests
+
+```bash
+cd frontend
+npm test
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- PlantVillage dataset for the training data
+- TensorFlow and Keras for deep learning
+- FastAPI for the backend framework
+- React for the frontend framework
