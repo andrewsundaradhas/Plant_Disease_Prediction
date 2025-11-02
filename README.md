@@ -2,7 +2,7 @@
 
 A comprehensive system for predicting crop health using machine learning and deep learning techniques.
 
-## 🚀 Features
+##  Features
 
 - **Machine Learning Model**: Trained on plant disease datasets for accurate predictions
 - **RESTful API**: FastAPI backend with comprehensive documentation
@@ -11,7 +11,7 @@ A comprehensive system for predicting crop health using machine learning and dee
 - **Scalable**: Designed to handle multiple concurrent requests
 - **Easy Setup**: One-command setup and deployment
 
-## 🛠️ Prerequisites
+##  Prerequisites
 
 - Python 3.8+
 - Node.js 16+
@@ -19,7 +19,7 @@ A comprehensive system for predicting crop health using machine learning and dee
 - MongoDB 5.0+
 - Git
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Clone the Repository
 
@@ -72,7 +72,7 @@ npm start
 
 The application will open in your default browser at `http://localhost:3000`
 
-## 🧠 Machine Learning Model
+##  Machine Learning Model
 
 The machine learning model is located in the `ml/` directory. To train a new model:
 
@@ -88,14 +88,14 @@ python train.py
 - **Output**: Probability distribution over disease classes
 - **Training**: Transfer learning with fine-tuning
 
-## 📚 API Documentation
+##  API Documentation
 
 Once the backend server is running, access the interactive API documentation at:
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 📦 Deployment
+##  Deployment
 
 ### Backend (Production)
 
@@ -114,7 +114,7 @@ cd frontend
 npm run build
 ```
 
-## 🧪 Testing
+##  Testing
 
 ### Backend Tests
 
@@ -130,21 +130,4 @@ cd frontend
 npm test
 ```
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- PlantVillage dataset for the training data
-- TensorFlow and Keras for deep learning
-- FastAPI for the backend framework
-- React for the frontend framework
